@@ -1,1 +1,25 @@
+# Jekyll build output
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Ruby
+vendor/
+
+# Bundler
+.bundle/
+
+# Node (if any frontend tooling added later)
+node_modules/
+
+# Project temp files
 temp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

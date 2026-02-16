@@ -1,7 +1,12 @@
 ---
 ---
 
-@use 'main';
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
 
 .content > p:has(.post-cat-sticker) {
   margin: 0;

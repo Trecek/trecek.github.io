@@ -3,11 +3,10 @@ title: "Taking Out the Trash: Reining in AI Slop"
 date: 2026-02-15 12:00:00 -0500
 categories: [AI, Agentic Coding]
 tags: [claude-code, skills, code-quality, ai-slop]
-description: >-
-  Agentic coders leave slop in your codebase. Instead of fighting the impulse,
-  decompose the cleanup into a specialized role.
 toc: true
 ---
+
+![KitKi](/assets/img/posts/cat-kitki-possessive.png){: .post-cat-sticker }
 
 **Do you take the trash out every time you throw something away?**
 **Or do you wait until it fills up?**
@@ -35,6 +34,9 @@ If you throw unrelated tasks at the agent, it will perform worse than giving it 
 
 We are telling the agent it needs to take the trash out every single time it throws a piece in. The agent should just not generate the trash comments in the first place, right? But agents have a sort of fixed state of mind. Different models have different quirks that are baked in. The agent can't help but want to leave useless comments all over your repo. It is an impulse, a tic, and to stop it means stopping it every time the impulse kicks in. You can't expect the agent to be perfect, and you don't want to waste time and your limited context window on suppressing an impulse that will never go away.
 
+![The id-slop skill's investigation workflow launching parallel subagents to scan for different slop categories](/assets/img/posts/id-slop-skill-workflow.png){: .shadow }
+_Step 1 of the id-slop skill: parallel subagents each targeting a specific slop category_
+
 Instead of trying to get the agent to take the trash out for every piece of trash, make a new agent whose sole purpose is to identify AI slop. Then run that specialized agent when the trash fills up. It will save you tokens, time, and your limited context window. I like to do it when my weekly Claude Code limits are about to reset.
 
 This is just a single obvious example of identifying parts of a task that need to be decomposed into a role. Of course, the complexity of the task at hand is the biggest influence on when and how much you need to decompose. But there are many examples of this in both the real world and AI, such as investigations, reviews, planning, testing, implementation, and verification.
@@ -42,26 +44,8 @@ This is just a single obvious example of identifying parts of a task that need t
 Claude Code is an agentic coding tool that supports skills. Skills are markdown files that give the agent specific instructions for a task. Think of them as reusable role definitions. You can find some example skills [here](https://github.com/Trecek/useful-claude-skills). You can see the slop removal skill used in this post here: [id-slop](https://github.com/Trecek/useful-claude-skills/blob/main/.claude/skills/id-slop/SKILL.md)
 
 Example summary of a slop scan:
-```
-  Slop Identification Complete
 
-  Plan: temp/id-slop/slop_removal_plan.md
-  Total Findings: 58
+![Slop identification scan results showing 58 findings across 8 categories](/assets/img/posts/id-slop-scan-summary.png){: .shadow }
+_Output from the id-slop skill after scanning a medium-sized codebase_
 
-  By Priority
-
-  - HIGH: 53 items (phase refs, backward compat comments, dead code, test cleanup)
-  - MEDIUM: 4 items (stale comments, unused parameters)
-  - LOW: 1 item (redundant pass)
-
-  By Category
-
-  1. Phase References: 26
-  2. Backward Compatibility Comments: 11
-  3. Dead Exception Classes: 4
-  4. Dead Functions: 8 (7 functions + 1 dataclass)
-  5. Test Cleanup: 3 files
-  6. Stale Comments: 2
-  7. Unused Parameters: 2
-  8. Redundant Code: 1
-```
+This is part of a larger shift in how software gets built. The focus is moving from perfect PRs to keeping code flowing like a production line, where specialized roles handle each stage and nothing blocks the flow. More on that in a future post.

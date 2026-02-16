@@ -2,3 +2,24 @@
 ---
 
 @use 'main';
+
+.content > p:has(.post-cat-sticker) {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+
+  a.popup {
+    float: right;
+    width: 131px;
+    margin-top: -10.5rem;
+    margin-right: 17rem;
+    overflow: visible;
+    z-index: 10;
+  }
+
+  img.post-cat-sticker {
+    width: 131px;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+    transform: rotate(6deg);
+  }
+}

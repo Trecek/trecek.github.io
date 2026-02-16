@@ -1,0 +1,18 @@
+version: "3"
+
+tasks:
+  start:
+    desc: Serve the site locally at http://127.0.0.1:4000
+    cmds:
+      - bundle exec jekyll serve
+
+  build:
+    desc: Build the site in production mode
+    cmds:
+      - JEKYLL_ENV=production bundle exec jekyll build
+
+  validate:
+    desc: Build and validate HTML/links
+    cmds:
+      - JEKYLL_ENV=production bundle exec jekyll build
+      - bundle exec htmlproofer _site --disable-external --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"

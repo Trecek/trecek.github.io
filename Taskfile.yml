@@ -4,7 +4,7 @@ tasks:
   start:
     desc: Serve the site locally at http://127.0.0.1:4000
     cmds:
-      - bundle exec jekyll serve
+      - bundle exec jekyll serve --future
 
   build:
     desc: Build the site in production mode

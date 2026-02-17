@@ -8,6 +8,9 @@ on:
       - README.md
       - LICENSE
 
+  schedule:
+    - cron: "33 17 * * *"   # Daily at ~12:33 PM ET (17:33 UTC)
+
   workflow_dispatch:
 
 permissions:

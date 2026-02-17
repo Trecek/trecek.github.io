@@ -8,6 +8,11 @@
 {%- endif -%}
 ';
 
+/* Hide banner on post pages — keeps og:image for social cards and home page tiles */
+.post-meta .mt-3.mb-3 {
+  display: none;
+}
+
 .content > p:has(.post-cat-sticker) {
   margin: 0;
   padding: 0;
@@ -24,6 +29,8 @@
 
   img.post-cat-sticker {
     width: 131px;
+    max-height: 131px;
+    object-fit: contain;
     filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
     transform: rotate(6deg);
   }

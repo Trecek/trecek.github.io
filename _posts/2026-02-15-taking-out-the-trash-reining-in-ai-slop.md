@@ -4,6 +4,9 @@ date: 2026-02-15 12:00:00 -0500
 categories: [AI, Agentic Coding]
 tags: [claude-code, skills, code-quality, ai-slop]
 toc: true
+image:
+  path: /assets/img/posts/id-slop-scan-summary.png
+  alt: "Slop identification scan results showing 58 findings across 8 categories"
 ---
 
 ![KitKi](/assets/img/posts/cat-kitki-possessive.png){: .post-cat-sticker }
@@ -13,7 +16,10 @@ toc: true
 
 Agentic coding is incredibly empowering, but there are a lot of nuances you learn along the way. It's categorically worth it though. Even if AI stopped improving today, it is already good enough to transform coding forever.
 
-There are frustrations you will initially run into when working with AI. AI, and each model, has a sort of personality you have to get used to and learn to work with. One of the most common frustrations I faced was the slop agents would drop into my codebase. No matter how many rules I made about not using my codebase as a notepad or journal, it would still do it. It tended to happen more frequently when the task was complex and the codebase was large. One of the things you'll see working with agentic coders is that they have a limited cognitive load. They will start dropping the small things once they've reached that maximum load. What could be smaller than non-functional commented out code? So that rule is the first to go for an over-worked agentic coder.
+There are frustrations you will initially run into when working with AI. AI, and each model, has a sort of personality you have to get used to and learn to work with.
+One of the most common frustrations I faced was the slop agents would drop into my codebase. No matter how many rules I made about not using my codebase as a notepad or journal, it would still do it. It tended to happen more frequently when the task was complex and the codebase was large.
+
+Agentic coders have a limited cognitive load. They will start dropping the small things once they've reached that maximum load. What could be smaller than non-functional commented out code? So that rule is the first to go for an over-worked agentic coder.
 
 **Example slop:**
 ```python
@@ -25,6 +31,8 @@ def migrate_session():  # Part of Phase 2 migration
 # NOTE: test-and-log removed in Phase 4. Use simple 'test' task.
 # baseline_manager removed - now handled by executor
 ```
+
+### The right question
 
 So does this mean AI is dumb? Is AI not ready? These are the wrong questions. The question is, can you work with this? And how? Working with agentic coders is a skill just like working with people is a skill, albeit agents are a bit more locked in their ways.
 
@@ -40,6 +48,8 @@ _Step 1 of the id-slop skill: parallel subagents each targeting a specific slop 
 Instead of trying to get the agent to take the trash out for every piece of trash, make a new agent whose sole purpose is to identify AI slop. Then run that specialized agent when the trash fills up. It will save you tokens, time, and your limited context window. I like to do it when my weekly Claude Code limits are about to reset.
 
 This is just a single obvious example of identifying parts of a task that need to be decomposed into a role. Of course, the complexity of the task at hand is the biggest influence on when and how much you need to decompose. But there are many examples of this in both the real world and AI, such as investigations, reviews, planning, testing, implementation, and verification.
+
+### The toolkit
 
 Claude Code is an agentic coding tool that supports skills. Skills are markdown files that give the agent specific instructions for a task. Think of them as reusable role definitions. You can find some example skills [here](https://github.com/Trecek/useful-claude-skills). You can see the slop removal skill used in this post here: [id-slop](https://github.com/Trecek/useful-claude-skills/blob/main/.claude/skills/id-slop/SKILL.md)
 

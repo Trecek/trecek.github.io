@@ -42,6 +42,9 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
 
+      - name: Check cat stickers
+        run: bash tools/check-cat-stickers.sh
+
       - name: Build site
         run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
         env:

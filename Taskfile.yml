@@ -14,5 +14,6 @@ tasks:
   validate:
     desc: Build and validate HTML/links
     cmds:
+      - bash tools/check-cat-stickers.sh
       - JEKYLL_ENV=production bundle exec jekyll build
       - bundle exec htmlproofer _site --disable-external --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"

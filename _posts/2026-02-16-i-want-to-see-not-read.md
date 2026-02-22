@@ -25,7 +25,7 @@ I can't handle more walls of text.
 Claude Code is a tool that lets AI explore, write, modify, and run code for you. 
 It supports skills, which are plain text markdown files with specific instructions that tell the AI how to perform a task. 
 
-My typical workflow:
+My typical skill workflow:
 ```
                                        ┌──────────────────────────────────────────────────┐
 (optional)          (optional)         │              Core Pipeline                       │

@@ -42,7 +42,7 @@ _I get dozens of plans like this every day that I have to review. My eyes are bl
 
 When I review a plan before running the implementation skill, I don't need to know every detail. My role is to guide toward an outcome, not an implementation. Testing infrastructure, reviews, linting, CI/CD workflows, and specialized agents catch most of the riffraff.
 
-If I could see a visualization of the proposed changes, even if I miss the details, as I review dozens of these plans a day, I will internalize the architecture progression of my project.
+If I could see a visualization of the proposed changes, even if I miss the details, as I review dozens of these plans a day, I will internalize the architectural progression of my project.
 
 So how do we visualize code? There are many ways to visualize a codebase, each from a different perspective (security, networking, the user, interfaces, modular, etc.). I used Gemini's deep research to explore the different strategies and philosophies around software visualization, then had Claude generate a skill for each category it identified.
 

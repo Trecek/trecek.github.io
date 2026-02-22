@@ -1,6 +1,6 @@
 ---
 title: "I Want to See, Not Read"
-date: 2026-02-22 12:00:00 -0500
+date: 2026-02-22 06:00:00 -0500
 categories: [AI, Agentic Coding]
 tags: [claude-code, skills, architecture, visualization, mermaid]
 description: "13 Lenses for Visualizing Code to Keep Up with Your Agentic Coders"

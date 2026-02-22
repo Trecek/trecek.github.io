@@ -15,22 +15,22 @@ image:
 
 Agentic coding makes software development fast. Too fast, yet not fast enough. 
 Your own software's development becomes a blur to you. 
-You find yourself constantly querying agents about your own codebase as you approve the AI generated plans. 
+You find yourself constantly querying agents about your own codebase as you approve the AI-generated plans. 
 Recently, between improvements in agentic AI and my own experience using them, I have found very few errors or issues in my agentic workflows. 
 The weak link used to be the agentic coder, now it's me. I am slogged with plans to review while trying to track & guide the development of my projects. 
 I can't handle more walls of text.
 
-### My current workflow
+### My workflow
 
 Claude Code is a tool that lets AI explore, write, modify, and run code for you. 
 It supports skills, which are plain text markdown files with specific instructions that tell the AI how to perform a task. 
 
 My typical workflow:
 ```
-                                    ┌──────────────────────────────────────────────────┐
-(optional)          (optional)      │              Core Pipeline                       │
-make-scenarios ──→ make-req ──────→ │ make-plan → dry-walkthrough → implement-worktree │
-                        ↑           └──────────────────────────────────────────────────┘
+                                       ┌──────────────────────────────────────────────────┐
+(optional)          (optional)         │              Core Pipeline                       │
+make-scenarios ──→ make-requirements─→ │ make-plan → dry-walkthrough → implement-worktree │
+                        ↑              └──────────────────────────────────────────────────┘
                   or use directly
 ```
 
@@ -77,90 +77,173 @@ So obviously we want a [Mermaid](https://mermaid.ai/) plot. Mermaid plots are a 
 
 Here's an example. This diagram was produced by an agent running a skill I use for making plans. That planning skill loads a diagramming skill with the lens it thinks is most relevant to the proposed changes. If the agent thinks an additional lens view is needed it will add it too.
 
-**Lens Used:** Module Dependency. This plan restructures import relationships by extracting shared logic and adding a new provider dependency. 
+#### **The problematic architecture**
+
+**Lens Used:** Module Dependency. 
 
 ```mermaid
 %%{init: {'flowchart': {'nodeSpacing': 50, 'rankSpacing': 70, 'curve': 'basis'}}}%%
 graph TB
+    %% CLASS DEFINITIONS %%
     classDef cli fill:#1a237e,stroke:#7986cb,stroke-width:2px,color:#fff;
-    classDef stateNode fill:#004d40,stroke:#4db6ac,stroke-width:2px,color:#fff;
-    classDef handler fill:#e65100,stroke:#ffb74d,stroke-width:2px,color:#fff;
     classDef phase fill:#6a1b9a,stroke:#ba68c8,stroke-width:2px,color:#fff;
+    classDef handler fill:#e65100,stroke:#ffb74d,stroke-width:2px,color:#fff;
+    classDef stateNode fill:#004d40,stroke:#4db6ac,stroke-width:2px,color:#fff;
+    classDef integration fill:#c62828,stroke:#ef9a9a,stroke-width:2px,color:#fff;
+    classDef gap fill:#ff6f00,stroke:#ffa726,stroke-width:2px,color:#000;
+
+    subgraph Layer3 ["LAYER 3 - APPLICATION"]
+        direction LR
+        CLI["apps/cli/<br/>━━━━━━━━━━<br/>Entry points<br/>planner, executor"]
+        API["apps/api/<br/>━━━━━━━━━━<br/>FastAPI endpoints"]
+    end
+
+    subgraph Layer2 ["LAYER 2 - AGENTS"]
+        direction LR
+        PLANNER["agents/graph/planner/<br/>━━━━━━━━━━<br/>Planning agent<br/>98 files, 21.3K LOC"]
+        EXECUTOR["agents/graph/executor/<br/>━━━━━━━━━━<br/>Execution agent<br/>163 files, 38.7K LOC"]
+    end
+
+    subgraph Layer1 ["LAYER 1 - INFRASTRUCTURE"]
+        direction TB
+        SDK["packages/sdk/<br/>━━━━━━━━━━<br/>Agent SDK<br/>134 files, 20.6K LOC"]
+        SCHEMA["packages/schema/<br/>━━━━━━━━━━<br/>Data layer<br/>169 files, 29.3K LOC"]
+    end
+
+    subgraph Layer0 ["LAYER 0 - EXTERNAL"]
+        direction LR
+        EXT["External Dependencies<br/>━━━━━━━━━━<br/>langgraph, anthropic<br/>sqlmodel, tree-sitter"]
+    end
+
+    %% VALID DEPENDENCIES (Downward) %%
+    CLI -->|"imports"| PLANNER
+    CLI -->|"imports"| EXECUTOR
+    API -->|"imports"| PLANNER
+    PLANNER -->|"135 imports"| SDK
+    PLANNER -->|"84 imports"| SCHEMA
+    EXECUTOR -->|"124 imports"| SDK
+    EXECUTOR -->|"135 imports"| SCHEMA
+    SDK --> EXT
+    SCHEMA --> EXT
+
+    %% CIRCULAR DEPENDENCY (VIOLATION) %%
+    SDK <-.->|"⚠ CIRCULAR<br/>14 files each"| SCHEMA
+
+    %% CLASS ASSIGNMENTS %%
+    class CLI,API cli;
+    class PLANNER,EXECUTOR phase;
+    class SDK,SCHEMA handler;
+    class EXT integration;
+```
+
+
+**Color Legend:**
+
+| Color | Category | Description |
+|-------|----------|-------------|
+| Dark Blue | Apps | Application layer entry points |
+| Purple | Agents | Agent/service layer (planner, executor) |
+| Orange | Infrastructure | Shared packages (sdk, schema) |
+| Red | External | Third-party dependencies |
+| Dashed Line | Violation | Circular dependency (BLOCKER) |
+
+
+#### **The proposed architecture**
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 50, 'rankSpacing': 70, 'curve': 'basis'}}}%%
+graph TB
+    %% CLASS DEFINITIONS %%
+    classDef cli fill:#1a237e,stroke:#7986cb,stroke-width:2px,color:#fff;
+    classDef phase fill:#6a1b9a,stroke:#ba68c8,stroke-width:2px,color:#fff;
+    classDef handler fill:#e65100,stroke:#ffb74d,stroke-width:2px,color:#fff;
+    classDef stateNode fill:#004d40,stroke:#4db6ac,stroke-width:2px,color:#fff;
     classDef newComponent fill:#2e7d32,stroke:#81c784,stroke-width:2px,color:#fff;
     classDef integration fill:#c62828,stroke:#ef9a9a,stroke-width:2px,color:#fff;
 
-    subgraph CLI_Layer ["CLI Layer (sync)"]
-        direction LR
-        CLI["cli.py<br/>━━━━━━━━━━<br/>skills list / install"]
+    subgraph Monorepo ["MONOREPO (GitHub)"]
+        direction TB
+
+        subgraph Apps ["Layer 3 - Apps"]
+            CLI2["apps/cli/<br/>━━━━━━━━━━<br/>Entry points"]
+        end
+
+        subgraph Agents ["Layer 2 - Agents"]
+            PLANNER2["agents/graph/planner/<br/>━━━━━━━━━━<br/>LangGraph planner"]
+            EXECUTOR2["agents/graph/executor/<br/>━━━━━━━━━━<br/>LangGraph executor"]
+        end
     end
 
-    subgraph MCP_Layer ["MCP Server Layer (async)"]
-        direction LR
-        SRV["server.py<br/>━━━━━━━━━━<br/>FastMCP server<br/>8 tools + prompts"]
-        PROV["★ SkillsDirectoryProvider<br/>━━━━━━━━━━<br/>skill:// resources<br/>from fastmcp.server.providers.skills"]
+    subgraph PyPI ["PyPI PACKAGES (Independent)"]
+        direction TB
+
+        subgraph Tier1 ["★ Tier 1 - Extract First"]
+            AST["★ ast-extractor<br/>━━━━━━━━━━<br/>Tree-sitter extraction<br/>8 files, 1.4K LOC"]
+            UTILS["★ agentic-planner-utils<br/>━━━━━━━━━━<br/>Pure utilities<br/>6 files, ~400 LOC"]
+            MODELS["★ agentic-planner-models<br/>━━━━━━━━━━<br/>SQLModel definitions<br/>25 files"]
+        end
+
+        subgraph Tier3 ["★ Tier 3 - After Refactor"]
+            CORE["★ agentic-planner-core<br/>━━━━━━━━━━<br/>Shared types/protocols<br/>Breaks circular dep"]
+            SDK2["● agentic-planner-sdk<br/>━━━━━━━━━━<br/>Full SDK package"]
+            SCHEMA2["● agentic-planner-schema<br/>━━━━━━━━━━<br/>Full schema package"]
+        end
     end
 
-    subgraph Resolution_Layer ["Shared Resolution Layer"]
-        direction LR
-        ROOTS["● build_skill_roots()<br/>━━━━━━━━━━<br/>Extracted module-level fn<br/>config → list of root paths"]
-        RESOLVER["SkillResolver<br/>━━━━━━━━━━<br/>sync scan + source tags<br/>resolve() / list_all()"]
+    subgraph External ["EXTERNAL"]
+        EXT2["tree-sitter<br/>sqlmodel<br/>langgraph"]
     end
 
-    subgraph Config_Layer ["Configuration Layer"]
-        direction LR
-        CFG["config.py<br/>━━━━━━━━━━<br/>SkillsConfig<br/>resolution_order"]
-    end
+    %% CLEAN DEPENDENCIES (No Cycles) %%
+    CLI2 --> PLANNER2
+    CLI2 --> EXECUTOR2
+    PLANNER2 --> SDK2
+    PLANNER2 --> SCHEMA2
+    EXECUTOR2 --> SDK2
+    EXECUTOR2 --> SCHEMA2
 
-    subgraph External ["External (FastMCP)"]
-        direction LR
-        FMCP["FastMCP<br/>━━━━━━━━━━<br/>mcp.add_provider()"]
-        SDP["SkillsDirectoryProvider<br/>━━━━━━━━━━<br/>fastmcp.server.providers.skills"]
-    end
+    SDK2 --> CORE
+    SDK2 --> UTILS
+    SDK2 --> AST
+    SCHEMA2 --> CORE
+    SCHEMA2 --> MODELS
 
-    %% CLI path
-    CLI -->|"uses"| RESOLVER
-    RESOLVER -->|"calls"| ROOTS
+    AST --> EXT2
+    MODELS --> EXT2
+    CORE --> EXT2
 
-    %% Server path
-    SRV -->|"registers"| PROV
-    PROV -->|"built from"| ROOTS
-    PROV -.->|"is instance of"| SDP
-
-    %% Shared dependency
-    ROOTS -->|"reads"| CFG
-    SRV -->|"imports"| FMCP
-
-    %% Class assignments
-    class CLI cli;
-    class SRV handler;
-    class PROV newComponent;
-    class ROOTS,RESOLVER phase;
-    class CFG stateNode;
-    class FMCP,SDP integration;
+    %% CLASS ASSIGNMENTS %%
+    class CLI2 cli;
+    class PLANNER2,EXECUTOR2 phase;
+    class SDK2,SCHEMA2 handler;
+    class AST,UTILS,MODELS,CORE newComponent;
+    class EXT2 integration;
 ```
 
 **Color Legend:**
 
 | Color | Category | Description |
 |-------|----------|-------------|
-| Dark Blue | CLI | Command-line entry points |
-| Orange | Server | MCP server (existing) |
-| Green | New | SkillsDirectoryProvider integration |
-| Purple | Resolution | Skill root building and resolution |
-| Teal | Config | Configuration layer |
-| Red | External | FastMCP framework |
+| Dark Blue | Apps | Application layer (stays in monorepo) |
+| Purple | Agents | Agent layer (stays in monorepo) |
+| Orange | Refactored | SDK/Schema after circular fix |
+| Green | New Package | Extracted PyPI packages |
+| Red | External | Third-party dependencies |
 
 The dot on the box means it is an existing component that will be modified by the proposed plan.  
 A star on the box means it is a new component being created by the proposed plan.
 
 ### A better substrate
 
-These architectural lenses help identify what parts of your architecture are being worked with. They also serve also as an easier substrate to communicate over with the agent. For example now I can ask, is "External (FastMCP)" actually external? Is this not a locally served MCP (It is)? Without the diagram, the plan has nothing in it that would have prompted this question.
+These architectural lenses help identify what parts of your architecture are being worked with.
+For example, at a glance I can see the dashed bidirectional arrow between SDK and Schema in the current architecture. That's a circular dependency. 
+In the proposed architecture I can see how the agent broke the cycle by extracting shared code into new packages that both sides depend on. Without the diagrams, the plan reads as a long list of file moves and import changes.
 
-These skills are another example of decomposing processes into specialized roles, and extending those roles to be a re-usable toolkit by other roles.
-Next up, we'll see how we can take this a step further by analyzing git diffs and commit history to track the evolution of a project architecture.
+These skills are another example of decomposing processes into roles, and extending those roles into a reusable toolkit.
 
 You can find more lens examples [here](https://github.com/Trecek/useful-claude-skills/tree/main/docs/arch-lens)
+
+Next up, we'll see how we can take this a step further by analyzing git diffs and commit history to track the evolution of a project architecture.
 
 
 ### My current workflow

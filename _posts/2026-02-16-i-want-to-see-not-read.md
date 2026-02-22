@@ -7,7 +7,7 @@ description: "13 Lenses for Visualizing Code to Keep Up with Your Agentic Coders
 toc: true
 mermaid: true
 image:
-  path: /assets/img/posts/arch-lens-workflow.png
+  path: /assets/img/posts/arch-lens-no-text-full-bg.png
   alt: "Agentic workflow with architecture lens visualization"
 ---
 

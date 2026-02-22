@@ -13,11 +13,17 @@ image:
 
 ![KitKat](/assets/img/posts/cat-kitkat-sleeping.png){: .post-cat-sticker }
 
-Agentic coding makes software development fast. Too fast, yet not fast enough. Your own software's development becomes a blur to you. You find yourself constantly querying agents about your own codebase as you approve the AI generated plans. Recently, between improvements in agentic AI and my own experience using them, I have found very few errors or issues in my agentic workflows. The weak link used to be the agentic coder, now it's me. I am slogged with plans to review while trying to track & guide the development of my projects. I can't handle more walls of text.
+Agentic coding makes software development fast. Too fast, yet not fast enough. 
+Your own software's development becomes a blur to you. 
+You find yourself constantly querying agents about your own codebase as you approve the AI generated plans. 
+Recently, between improvements in agentic AI and my own experience using them, I have found very few errors or issues in my agentic workflows. 
+The weak link used to be the agentic coder, now it's me. I am slogged with plans to review while trying to track & guide the development of my projects. 
+I can't handle more walls of text.
 
 ### My current workflow
 
-Claude Code is a tool that lets AI write, modify, and run code for you. It supports skills, which are markdown files with specific instructions that tell the AI how to perform a task. Think of them as recipes for an AI worker. You give it a recipe, it follows the steps.
+Claude Code is a tool that lets AI explore, write, modify, and run code for you. 
+It supports skills, which are plain text markdown files with specific instructions that tell the AI how to perform a task. 
 
 My typical workflow:
 ```
@@ -34,11 +40,11 @@ _I get dozens of plans like this every day that I have to review. My eyes are bl
 
 ### I want to see, not read
 
-When I review a plan before running the implementation, I don't need to know every detail. My role is to guide toward an outcome, not an implementation. Testing infrastructure, reviews, linting, CI/CD workflows, and specialized agents catch most of the riffraff.
+When I review a plan before running the implementation skill, I don't need to know every detail. My role is to guide toward an outcome, not an implementation. Testing infrastructure, reviews, linting, CI/CD workflows, and specialized agents catch most of the riffraff.
 
 If I could see a visualization of the proposed changes, even if I miss the details, as I review dozens of these plans a day, I will internalize the architecture progression of my project.
 
-So how do we visualize code? There are many ways to visualize a codebase, each from a different perspective (security, networking, the user, interfaces, modular, etc.). This sounds like a deep research question for Gemini. And it was. I used Gemini's deep research to explore the different strategies and philosophies around software visualization, then had Claude generate a skill for each category it identified.
+So how do we visualize code? There are many ways to visualize a codebase, each from a different perspective (security, networking, the user, interfaces, modular, etc.). I used Gemini's deep research to explore the different strategies and philosophies around software visualization, then had Claude generate a skill for each category it identified.
 
 ### The 13 perspectives (lenses) of a codebase
 [Architectural skills](https://github.com/Trecek/useful-claude-skills/tree/main/docs/arch-lens)
@@ -61,7 +67,11 @@ So how do we visualize code? There are many ways to visualize a codebase, each f
 
 ### Staying in the IDE
 
-Okay so I have a bunch of lenses for visualizing code in various ways. What are we visualizing with? Well, I am not a fan of having to leave my code to work with my code. So I need my visualization to stay within my IDE (VSCode). I am not even a fan of having to leave the exact document I'm reviewing. So obviously we want a [Mermaid](https://mermaid.ai/) plot. Not those mermaids. Mermaid plots are a versatile plotting library you can embed directly into your markdown files and they will render with the markdown file.
+Okay so I have a bunch of lenses for visualizing code in various ways. What are we visualizing with? 
+Well, I am not a fan of having to leave my code to work with my code. 
+So I need my visualization to stay within my IDE (VSCode). 
+I am not even a fan of having to leave the exact document I'm reviewing. 
+So obviously we want a [Mermaid](https://mermaid.ai/) plot. Mermaid plots are a versatile plotting library you can embed directly into your markdown files and they will render with the markdown file.
 
 ### What it looks like
 
@@ -148,8 +158,10 @@ A star on the box means it is a new component being created by the proposed plan
 These architectural lenses help identify what parts of your architecture are being worked with. They also serve also as an easier substrate to communicate over with the agent. For example now I can ask, is "External (FastMCP)" actually external? Is this not a locally served MCP (It is)? Without the diagram, the plan has nothing in it that would have prompted this question.
 
 These skills are another example of decomposing processes into specialized roles, and extending those roles to be a re-usable toolkit by other roles.
+Next up, we'll see how we can take this a step further by analyzing git diffs and commit history to track the evolution of a project architecture.
 
 You can find more lens examples [here](https://github.com/Trecek/useful-claude-skills/tree/main/docs/arch-lens)
+
 
 ### My current workflow
 

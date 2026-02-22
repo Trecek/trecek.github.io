@@ -243,7 +243,7 @@ These skills are another example of decomposing processes into roles, and extend
 
 You can find more lens examples [here](https://github.com/Trecek/useful-claude-skills/tree/main/docs/arch-lens)
 
-Next up, we'll see how we can take this a step further by analyzing git diffs and commit history to track the evolution of a project architecture.
+Next up, we'll see how we can take this a step further by analyzing git diffs and commit history to track the evolution of a project's architecture.
 
 
 ### My current workflow
